@@ -108,7 +108,6 @@ function _createLocs() {
         _createDemoLocs()
     }
 }
-
 function _createDemoLocs() {
     var locs =
         [
