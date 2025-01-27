@@ -104,6 +104,7 @@ function setSortBy(sortBy = {}) {
 
 function _createLocs() {
     const locs = utilService.loadFromStorage(DB_KEY)
+    
     if (!locs || !locs.length) {
         _createDemoLocs()
     }
@@ -144,10 +145,13 @@ function _createDemoLocs() {
         ]
 
     locs = locs.map(_createLoc)
+    
     utilService.saveToStorage(DB_KEY, locs)
 }
 
 function _createLoc(loc) {
+    
+
     loc.id = utilService.makeId()
     loc.createdAt = loc.updatedAt = utilService.randomPastTime()
     return loc

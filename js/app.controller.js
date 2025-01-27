@@ -16,6 +16,7 @@ window.app = {
     onShareLoc,
     onSetSortBy,
     onSetFilterBy,
+    distance,
 }
 
 function onInit() {
@@ -42,7 +43,9 @@ function renderLocs(locs) {
             <h4>  
                 <span>${loc.name}</span>
                 <span title="${loc.rate} stars">${'★'.repeat(loc.rate)}</span>
+                
             </h4>
+            <h3 class='distance hidde'>Distance: ${loc.k}K</h3>
             <p class="muted">
                 Created: ${utilService.elapsedTime(loc.createdAt)}
                 ${(loc.createdAt !== loc.updatedAt) ?
@@ -102,6 +105,7 @@ function onAddLoc(geo) {
     const loc = {
         name: locName,
         rate: +prompt(`Rate (1-5)`, '3'),
+        k:0,
         geo
     }
     locService.save(loc)
@@ -114,6 +118,7 @@ function onAddLoc(geo) {
             console.error('OOPs:', err)
             flashMsg('Cannot add location')
         })
+        
 }
 
 function loadAndRenderLocs() {
@@ -128,16 +133,24 @@ function loadAndRenderLocs() {
 function onPanToUserPos() {
     mapService.getUserPosition()
         .then(latLng => {
-            mapService.panTo({ ...latLng, zoom: 15 })
-            unDisplayLoc()
-            loadAndRenderLocs()
-            flashMsg(`You are at Latitude: ${latLng.lat} Longitude: ${latLng.lng}`)
+            mapService.panTo({ ...latLng, zoom: 15 });
+            
+            unDisplayLoc();
+            const updatedLocs = distance(latLng);
+            renderLocs(updatedLocs);
+            const distanceElements = document.querySelectorAll('.distance');
+            distanceElements.forEach(el => {
+                el.classList.remove('hidde');
+            });  
+        
+            flashMsg(`You are at Latitude: ${latLng.lat} Longitude: ${latLng.lng}`);
         })
         .catch(err => {
-            console.error('OOPs:', err)
-            flashMsg('Cannot get your position')
-        })
+            console.error('OOPs:', err);
+            flashMsg('Cannot get your position');
+        });
 }
+
 
 function onUpdateLoc(locId) {
     locService.getById(locId)
@@ -314,4 +327,15 @@ function cleanStats(stats) {
         return acc
     }, [])
     return cleanedStats
+}
+function distance(myloc) {
+    const storedArray = localStorage.getItem('locs');
+    const locs = storedArray ? JSON.parse(storedArray) : [];
+
+    locs.forEach(loc => {
+        loc.k = utilService.getDistance(myloc, loc.geo, 'k'); // Update loc.k 
+    });
+
+  
+    return locs;
 }

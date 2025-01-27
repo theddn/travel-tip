@@ -75,8 +75,7 @@ function setMarker(loc) {
         title: loc.name
     })
 }
-
-// This function provides a Promise API to the callback-based-api of getCurrentPosition
+//var This function provides a Promise API to the callback-based-api of getCurrentPosition
 function getUserPosition() {
     return new Promise((resolve, reject) => {
         function onSuccess(res) {
@@ -89,7 +88,6 @@ function getUserPosition() {
         navigator.geolocation.getCurrentPosition(onSuccess, reject)
     })
 }
-
 function _connectGoogleApi() {
     if (window.google) return Promise.resolve()
 
